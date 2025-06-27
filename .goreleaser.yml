@@ -1,5 +1,29 @@
-# Skip Go builds since this is a static web application
-builds: []
+# Configuration for static web application with minimal Go binary for GoReleaser
+
+# Build minimal Go binary (placeholder for GoReleaser)
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    binary: hello-world-web
+    main: ./cmd/hello-world-web
+
+# Disable archives
+archives: []
+
+# Disable checksums
+checksum:
+  name_template: 'checksums.txt'
+
+# Disable snapshots
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
 
 # Docker builds
 dockers:
