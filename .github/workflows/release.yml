@@ -56,19 +56,35 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get commits since last tag
+          if git describe --tags --abbrev=0 2>/dev/null; then
+            PREVIOUS_TAG=$(git describe --tags --abbrev=0)
+            CHANGELOG=$(git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD)
+          else
+            CHANGELOG=$(git log --pretty=format:"- %s" --reverse)
+          fi
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Create Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
           body: |
             ## What's Changed
             
             This release includes:
             - Docker image for multiple platforms (amd64, arm64)
             - Static web content served by nginx
+            
+            ## Changelog
+            
+            ${{ steps.changelog.outputs.changelog }}
             
             ## Usage
             
@@ -77,4 +93,6 @@ jobs:
             docker run -p 8080:8080 ghcr.io/${{ github.repository }}:${{ github.ref_name }}
             ```
           draft: false
-          prerelease: false 
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
