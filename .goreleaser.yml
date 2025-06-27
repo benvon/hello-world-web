@@ -1,3 +1,6 @@
+# Skip Go builds since this is a static web application
+builds: []
+
 # Docker builds
 dockers:
   - image_templates:
