@@ -48,4 +48,7 @@ git push origin "$VERSION"
 
 echo "Release $VERSION has been created and pushed!"
 echo "GitHub Actions will now build and publish the Docker image to GitHub Container Registry."
-echo "You can monitor the progress at: https://github.com/$(git config --get remote.origin.url | sed 's/.*github.com[:/]\([^/]*\/[^/]*\).*/\1/')/actions" 
+echo "You can monitor the progress at: https://github.com/$(git config --get remote.origin.url | sed 's/.*github.com[:/]\([^/]*\/[^/]*\).*/\1/')/actions"
+echo ""
+echo "Once complete, you can pull the image with:"
+echo "docker pull ghcr.io/$(git config --get remote.origin.url | sed 's/.*github.com[:/]\([^/]*\/[^/]*\).*/\1/')/$VERSION" 

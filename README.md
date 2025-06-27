@@ -11,7 +11,7 @@ This is a simple web application that serves a "Hello World" page using nginx. I
 - Lightweight nginx-based web server
 - Docker containerization
 - Multi-platform support (amd64, arm64)
-- Automated releases with GoReleaser
+- Automated releases with GitHub Actions
 - GitHub Container Registry integration
 
 ## Quick Start
@@ -51,13 +51,12 @@ hello-world-web/
 ├── .github/          # GitHub Actions workflows
 ├── scripts/          # Release scripts
 ├── Dockerfile        # Docker configuration
-├── .goreleaser.yml   # GoReleaser configuration
 └── README.md         # This file
 ```
 
 ## Release Process
 
-This project uses GoReleaser to automate releases and Docker image publishing to GitHub Container Registry.
+This project uses GitHub Actions to automate releases and Docker image publishing to GitHub Container Registry.
 
 ### Creating a Release
 
@@ -85,19 +84,20 @@ This project uses GoReleaser to automate releases and Docker image publishing to
 ### What Happens During a Release
 
 1. **GitHub Actions Workflow** (`release.yml`) triggers on tag push
-2. **GoReleaser** builds multi-platform Docker images
+2. **Docker images** are built for multiple platforms (amd64, arm64)
 3. **Docker images** are published to GitHub Container Registry
-4. **GitHub Release** is created with changelog
-5. **Docker manifests** are created for multi-platform support
+4. **GitHub Release** is created with usage instructions
+5. **Multi-platform manifests** are created for easy deployment
 
 ## Configuration
 
-### GoReleaser
+### GitHub Actions
 
-The `.goreleaser.yml` file configures:
+The `.github/workflows/release.yml` file configures:
 - Docker image building for multiple platforms
 - GitHub Container Registry publishing
-- Docker manifest creation for multi-arch support
+- Automatic release creation
+- Multi-platform manifest creation
 
 ### Docker
 
