@@ -1,0 +1,40 @@
+version: 2
+updates:
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/New_York"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "{{ github.repository_owner }}"
+    assignees:
+      - "{{ github.repository_owner }}"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+
+  # Docker
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/New_York"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "{{ github.repository_owner }}"
+    assignees:
+      - "{{ github.repository_owner }}"
+    commit-message:
+      prefix: "docker"
+      include: "scope"
+    # Only update the nginx base image
+    target-branch: "main"
+    labels:
+      - "dependencies"
+      - "docker" 
