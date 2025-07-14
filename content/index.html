@@ -7,5 +7,29 @@
 </head>
 <body>
     <h1>Hello World</h1>
+    <div id="healthcheck-section" style="display:none;">
+        <button id="healthcheck-btn">Check DB Health</button>
+        <pre id="healthcheck-result"></pre>
+    </div>
+    <script>
+    // Feature toggle for health check UI (replace with env-injected value in Docker build)
+    var HEALTHCHECK_ENABLED = true; // Set to false to hide
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (HEALTHCHECK_ENABLED) {
+            document.getElementById('healthcheck-section').style.display = '';
+        }
+        document.getElementById('healthcheck-btn').addEventListener('click', function() {
+            fetch('/api/health')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('healthcheck-result').textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(e => {
+                    document.getElementById('healthcheck-result').textContent = 'Error: ' + e;
+                });
+        });
+    });
+    </script>
 </body>
 </html>
