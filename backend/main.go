@@ -49,7 +49,7 @@ func main() {
 
 	port := os.Getenv("API_PORT")
 	if port == "" {
-		port = "8080"
+		port = "8081"
 	}
 	log.Printf("Starting API server on :%s", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
