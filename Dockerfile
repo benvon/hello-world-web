@@ -16,4 +16,8 @@ COPY --chmod=755 scripts/entrypoint.sh /entrypoint.sh
 # RUN chmod +x /entrypoint.sh
 
 EXPOSE 8080 8081
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:8080/api/health || exit 1
+
 ENTRYPOINT ["/entrypoint.sh"]
