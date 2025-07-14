@@ -21,12 +21,36 @@
         }
         document.getElementById('healthcheck-btn').addEventListener('click', function() {
             fetch('/api/health')
-                .then(r => r.json())
+                .then(r => {
+                    if (!r.ok) {
+                        // Provide meaningful error messages based on status code
+                        let errorMessage;
+                        switch (r.status) {
+                            case 404:
+                                errorMessage = 'Health check endpoint not found. The feature may be disabled (HEALTHCHECK_ENABLED=false)';
+                                break;
+                            case 500:
+                                errorMessage = 'Server error occurred while checking database health';
+                                break;
+                            case 503:
+                                errorMessage = 'Service temporarily unavailable';
+                                break;
+                            default:
+                                errorMessage = `HTTP ${r.status}: ${r.statusText}`;
+                        }
+                        throw new Error(errorMessage);
+                    }
+                    const contentType = r.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        throw new Error('Response is not JSON');
+                    }
+                    return r.json();
+                })
                 .then(data => {
                     document.getElementById('healthcheck-result').textContent = JSON.stringify(data, null, 2);
                 })
                 .catch(e => {
-                    document.getElementById('healthcheck-result').textContent = 'Error: ' + e;
+                    document.getElementById('healthcheck-result').textContent = 'Error: ' + e.message;
                 });
         });
     });
