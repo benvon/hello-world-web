@@ -7,5 +7,53 @@
 </head>
 <body>
     <h1>Hello World</h1>
+    <div id="healthcheck-section" style="display:none;">
+        <button id="healthcheck-btn">Check DB Health</button>
+        <pre id="healthcheck-result"></pre>
+    </div>
+    <script>
+    // Feature toggle for health check UI (replace with env-injected value in Docker build)
+    var HEALTHCHECK_ENABLED = true; // Set to false to hide
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (HEALTHCHECK_ENABLED) {
+            document.getElementById('healthcheck-section').style.display = '';
+        }
+        document.getElementById('healthcheck-btn').addEventListener('click', function() {
+            fetch('/api/health')
+                .then(r => {
+                    if (!r.ok) {
+                        // Provide meaningful error messages based on status code
+                        let errorMessage;
+                        switch (r.status) {
+                            case 404:
+                                errorMessage = 'Health check endpoint not found. The feature may be disabled (HEALTHCHECK_ENABLED=false)';
+                                break;
+                            case 500:
+                                errorMessage = 'Server error occurred while checking database health';
+                                break;
+                            case 503:
+                                errorMessage = 'Service temporarily unavailable';
+                                break;
+                            default:
+                                errorMessage = `HTTP ${r.status}: ${r.statusText}`;
+                        }
+                        throw new Error(errorMessage);
+                    }
+                    const contentType = r.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        throw new Error('Response is not JSON');
+                    }
+                    return r.json();
+                })
+                .then(data => {
+                    document.getElementById('healthcheck-result').textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(e => {
+                    document.getElementById('healthcheck-result').textContent = 'Error: ' + e.message;
+                });
+        });
+    });
+    </script>
 </body>
 </html>
