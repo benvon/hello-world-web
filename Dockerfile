@@ -5,13 +5,41 @@ COPY backend/ ./backend/
 WORKDIR /app/backend
 RUN go build -o /app/backend-api
 
+FROM rust:1.84 AS efs-builder
+WORKDIR /build
+RUN apt-get update && \
+    apt-get install -y \
+      binutils \
+      gettext \
+      git \
+      libssl-dev \
+      pkg-config \
+      && \
+    git clone https://github.com/aws/efs-utils.git && \
+    cd efs-utils && \
+    ./build-deb.sh
+
+
 # Final image
 FROM ghcr.io/nginx/nginx-unprivileged:1.29-bookworm
 
 USER root
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends nfs-common && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends \
+    curl \
+    nfs-common \
+    python3-boto3 \
+    python3-pip \
+    wget \
+    && \
+    rm -rf /var/lib/apt/lists/* && \
+    mkdir -p /efs-utils
+
+COPY --from=efs-builder /build/efs-utils/build/amazon-efs-utils*deb /efs-utils/
+RUN apt-get update && \
+    apt-get install -y /efs-utils/amazon-efs-utils*deb && \
+    rm /efs-utils/amazon-efs-utils*deb 
+
 USER 101
 
 COPY --from=builder /app/backend-api /usr/local/bin/backend-api
