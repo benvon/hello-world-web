@@ -1,10 +1,11 @@
 # Build Go backend
-FROM golang:1.24 AS builder
+FROM golang:1.24 AS api-builder
 WORKDIR /app
 COPY backend/ ./backend/
 WORKDIR /app/backend
 RUN go build -o /app/backend-api
 
+# Build EFS utils
 FROM rust:1.84 AS efs-builder
 WORKDIR /build
 RUN apt-get update && \
@@ -29,6 +30,7 @@ RUN apt-get update && \
     curl \
     nfs-common \
     python3-boto3 \
+    python3-botocore \
     python3-pip \
     wget \
     && \
@@ -42,7 +44,7 @@ RUN apt-get update && \
 
 USER 101
 
-COPY --from=builder /app/backend-api /usr/local/bin/backend-api
+COPY --from=api-builder /app/backend-api /usr/local/bin/backend-api
 COPY content/ /usr/share/nginx/html/
 COPY conf.d/ /etc/nginx/conf.d/
 
