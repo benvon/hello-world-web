@@ -7,6 +7,13 @@ RUN go build -o /app/backend-api
 
 # Final image
 FROM ghcr.io/nginx/nginx-unprivileged:1.29-bookworm
+
+USER root
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends nfs-common && \
+    rm -rf /var/lib/apt/lists/*
+USER 101
+
 COPY --from=builder /app/backend-api /usr/local/bin/backend-api
 COPY content/ /usr/share/nginx/html/
 COPY conf.d/ /etc/nginx/conf.d/
