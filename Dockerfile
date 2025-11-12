@@ -6,7 +6,7 @@ WORKDIR /app/backend
 RUN go build -o /app/backend-api
 
 # Build EFS utils
-FROM rust:1.90 AS efs-builder
+FROM rust:1.91 AS efs-builder
 WORKDIR /build
 RUN apt-get update && \
     apt-get install -y \
