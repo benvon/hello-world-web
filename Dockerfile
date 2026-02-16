@@ -1,5 +1,5 @@
 # Build Go backend
-FROM golang:1.25 AS api-builder
+FROM golang:1.26 AS api-builder
 WORKDIR /app
 COPY backend/ ./backend/
 WORKDIR /app/backend
